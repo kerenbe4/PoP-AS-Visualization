@@ -42,6 +42,7 @@
 			$this->mysqli = NULL;
 		}
 		
+		/* generates a connection to the DB */
 		private function get_connection()
 		{
 			if($this->mysqli != NULL)
@@ -61,6 +62,7 @@
 			return $mysqli;
 		}
 		
+		/* creates an edges(links) table by table name */
 		private function create_links_table(){
 			if(($this->mysqli = $this->get_connection()) == NULL)
 				return false;
@@ -71,9 +73,13 @@
 			return true;
 		}
 		
+		/* the query returned gets all PoPs that match the AS list of the user query */
 		private function getPoPQuery(){return "select * from `".$this->schema."`.`".$this->idg->getPoPTblName()."` where ASN in(".$this->asList.")";}
+		
+		/* the query returned gets all edges that match the AS list of the user query */
 		private function getEdgeQuery(){return "select * from `".$this->schema."`.`".$this->idg->getLinksTblName()."` where SourceAS in (".$this->asList.") AND DestAS in (".$this->asList.")";}
 		
+		/* executes the sql query ($sql) and parses it to xml files */
 		private function sql2xml($sql,$dir)
 		{
 			$pageSize = fetchXMLRecordsPagingBufferSize; // Records
@@ -190,6 +196,7 @@
 			return true;
 		}
 
+		/* drops the PoP and edge tables (if exists)*/
 		private function drop_tables()
 		{
 			if(($this->mysqli = $this->get_connection()) == NULL)
@@ -205,37 +212,15 @@
 			
 		}
 		
+		/* creates the PoP XML for the query */
 		private function write_pop_XML()
 		{
-			/*
-			$filepath = ($this->xml_dst_dir.'/pop.xml');
-			$filewrite = fopen($filepath, "w");
-			if($this->pop_xmlString = $this->sql2xml($this->getPoPQuery())){
-				fwrite($filewrite, $this->pop_xmlString);
-				fclose($filewrite);
-				return true;
-			}
-			return false;
-			 * 
-			 */
-			
 			return $this->sql2xml($this->getPoPQuery(), 'pop');
 		}
 		
+		/* creates the edge XML for the query */
 		private function write_edge_XML()
 		{
-			/*
-			$filepath = ($this->xml_dst_dir.'/edges.xml');
-			$filewrite = fopen($filepath, "w");
-			if($this->edge_xmlString = $this->sql2xml($this->getEdgeQuery())){
-				fwrite($filewrite, $this->edge_xmlString);
-				fclose($filewrite);
-				return true;
-			}
-			return false;
-			 * 
-			 */
-			
 			if($this->create_links_table())
 				if($this->sql2xml($this->getEdgeQuery(), 'edges'))
 					return true;
@@ -243,9 +228,9 @@
 			return false;
 		}
 		
+		/* creates a new dirctory to hold query results */
 		private function createDir($path)
-		{
-			// making a new dir to hold query results 
+		{ 
 			if(!file_exists($path)){			 		
 				if(!mkdir($path, 0777)) { 
 				   return false;
@@ -254,6 +239,8 @@
 			return true;	
 		}
 		
+		/* creates a new directory for the query 
+		 * and generates the PoP and edge XML files */
 		public function writeXML()
 		{
 			if($this->createDir($this->xml_dst_dir)){

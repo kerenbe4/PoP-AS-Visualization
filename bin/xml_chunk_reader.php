@@ -15,6 +15,7 @@
 		
 		private $firstTime;
 		
+		/* initialize reader */
 		private function init(){
 			$this->currentChunk = 0;
 			$this->isDivided = false;
@@ -36,7 +37,7 @@
 			
     		$this->init();
     	}
-		
+		 /* loads the next XML chunck */
 		public function loadNext(){
 			$sxe = false;
 			if($this->isDivided && !$this->firstTime){
@@ -49,10 +50,12 @@
 			return $sxe;
 		}
 		
+		/* indicates if the result file is divided into chunks */
 		public function isDivided2Chunks(){
 			return $this->isDivided;
 		}
 		
+		/* rsets the reader to ints initial state */
 		public function resetReader(){
 			$this->init();
 		}
